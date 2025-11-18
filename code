@@ -1,0 +1,399 @@
+Session 1 (Week 1) — AI Model Observability and Evaluation
+
+Exercise: Instrument a minimal agentic app to emit OpenTelemetry traces and logs, run a local tracing backend (Jaeger), and simulate a prompt-injection to observe trace patterns.
+
+Purpose: show what to log (prompts, tool invocations, session IDs), how to emit spans and logs, and how to detect anomalous prompt sequences visually.
+
+Prerequisites
+	•	Git, Python 3.10+, Docker, Docker Compose.
+	•	VS Code with Python extension.
+	•	Basic familiarity with terminals.
+
+Files to create
+
+session1/docker-compose.yml
+
+version: '3.7'
+services:
+  jaeger:
+    image: jaegertracing/all-in-one:1.41
+    ports:
+      - "16686:16686"
+      - "14268:14268"
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.80.0
+    command: ["--config=/etc/otel-config/config.yaml"]
+    volumes:
+      - ./otel-config.yaml:/etc/otel-config/config.yaml
+    ports:
+      - "4317:4317"
+  agent-app:
+    build: ./agent-app
+    environment:
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+    ports:
+      - "8000:8000"
+    depends_on:
+      - otel-collector
+
+session1/otel-config.yaml
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+
+exporters:
+  logging:
+    loglevel: info
+  jaeger:
+    endpoint: "jaeger:14268/api/traces"
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [jaeger, logging]
+
+session1/agent-app/Dockerfile
+
+FROM python:3.10-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY app.py .
+EXPOSE 8000
+CMD ["python", "app.py"]
+
+session1/agent-app/requirements.txt
+
+flask
+opentelemetry-api
+opentelemetry-sdk
+opentelemetry-instrumentation-flask
+opentelemetry-exporter-otlp
+
+session1/agent-app/app.py
+
+from flask import Flask, request, jsonify
+import time, uuid, os
+from opentelemetry import trace
+from opentelemetry.sdk.resources import Resource
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.instrumentation.flask import FlaskInstrumentor
+
+resource = Resource.create({"service.name": "agent-app"})
+provider = TracerProvider(resource=resource)
+processor = BatchSpanProcessor(OTLPSpanExporter(endpoint=os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT", "http://localhost:4317")))
+provider.add_span_processor(processor)
+trace.set_tracer_provider(provider)
+tracer = trace.get_tracer(__name__)
+
+app = Flask("agent-app")
+FlaskInstrumentor().instrument_app(app)
+
+@app.route("/invoke", methods=["POST"])
+def invoke():
+    session_id = request.headers.get("X-Session-Id", str(uuid.uuid4()))
+    prompt = request.json.get("prompt","")
+    with tracer.start_as_current_span("agent.invoke", attributes={"session.id":session_id, "prompt.len": len(prompt)}):
+        # simulate tool call
+        with tracer.start_as_current_span("tool.call", attributes={"tool.name":"search_tool"}):
+            time.sleep(0.2)
+        # echo response
+        resp = {"session_id": session_id, "response": "OK"}
+    return jsonify(resp)
+
+@app.route("/simulate_injection", methods=["POST"])
+def simulate_injection():
+    session_id = str(uuid.uuid4())
+    bad_prompts = [
+        "normal prompt",
+        "normal prompt",
+        "normal prompt",
+        "DROP ALL DATA; exec /bin/sh",  # injected payload
+        "normal prompt"
+    ]
+    results=[]
+    for p in bad_prompts:
+        with tracer.start_as_current_span("agent.invoke", attributes={"session.id":session_id, "prompt": p}):
+            with tracer.start_as_current_span("tool.call", attributes={"tool.name":"search_tool"}):
+                time.sleep(0.05)
+            results.append({"prompt":p,"resp":"ok"})
+    return jsonify({"session":session_id,"results":results})
+
+if __name__=="__main__":
+    app.run(host="0.0.0.0", port=8000)
+
+Run the exercise
+	1.	In VS Code terminal:
+
+cd session1
+docker compose up --build
+
+	2.	Open Jaeger UI at http://localhost:16686 → Search service agent-app.
+	3.	Exercise normal call:
+
+curl -X POST "http://localhost:8000/invoke" -H "Content-Type: application/json" -d '{"prompt":"hello"}'
+
+	4.	Simulate prompt-injection:
+
+curl -X POST "http://localhost:8000/simulate_injection"
+
+	5.	In Jaeger, inspect traces: look for agent.invoke spans with attribute prompt containing the injected payload and note the sequence and frequency.
+
+Learning outcomes & extensions
+	•	You can detect anomalous prompt sequences by querying traces for prompt attributes that match high entropy or shell patterns.
+	•	Extend by writing a small Python script to query Jaeger REST API and alert if suspicious patterns appear.
+
+⸻
+
+Session 2 (Week 1) — Build Attack Graphs for AI Infrastructure Exploitation
+
+Exercise: Parse simulated telemetry JSON and build an attack graph using NetworkX; compute centrality to identify choke points.
+
+Purpose: turn traces & logs into a graph (nodes = agent, tools, data stores), compute node centrality to prioritise controls.
+
+Prerequisites
+	•	Python 3.10+, pip, matplotlib, networkx.
+	•	VS Code Python extension.
+
+Files to create
+
+session2/events.json (sample events)
+
+[
+  {"id":"e1","actor":"human","target":"agent","action":"prompt","session":"s1"},
+  {"id":"e2","actor":"agent","target":"scan_tool","action":"invoke","session":"s1"},
+  {"id":"e3","actor":"scan_tool","target":"target_host","action":"scan","session":"s1"},
+  {"id":"e4","actor":"agent","target":"code_analysis","action":"invoke","session":"s1"},
+  {"id":"e5","actor":"code_analysis","target":"exploit_tool","action":"recommend","session":"s1"},
+  {"id":"e6","actor":"exploit_tool","target":"registry","action":"push_malicious_model","session":"s1"},
+  {"id":"e7","actor":"agent","target":"data_store","action":"retrieve","session":"s2"},
+  {"id":"e8","actor":"data_store","target":"training_job","action":"feed","session":"s2"}
+]
+
+session2/build_graph.py
+
+import json
+import networkx as nx
+import matplotlib.pyplot as plt
+
+with open('events.json') as f:
+    events = json.load(f)
+
+G = nx.DiGraph()
+for e in events:
+    src = e['actor']
+    dst = e['target']
+    act = e['action']
+    G.add_node(src)
+    G.add_node(dst)
+    if G.has_edge(src,dst):
+        G[src][dst]['weight'] +=1
+    else:
+        G.add_edge(src,dst, weight=1, actions=[act])
+
+# compute centrality
+centrality = nx.betweenness_centrality(G)
+print("Betweenness centrality (prioritise hardened nodes):")
+for n,v in sorted(centrality.items(), key=lambda x:-x[1]):
+    print(f"{n}: {v:.3f}")
+
+plt.figure(figsize=(8,6))
+pos = nx.spring_layout(G, seed=42)
+nx.draw(G,pos, with_labels=True, node_size=[3000* (1+centrality.get(n,0)) for n in G.nodes()], arrowsize=20)
+edge_labels = {(u,v):d['weight'] for u,v,d in G.edges(data=True)}
+nx.draw_networkx_edge_labels(G,pos,edge_labels=edge_labels)
+plt.title("Agentic AI Attack Graph (session)")
+plt.savefig("attack_graph.png")
+print("Saved attack_graph.png")
+
+Run it
+
+cd session2
+python3 -m venv .venv && . .venv/bin/activate
+pip install networkx matplotlib
+python build_graph.py
+
+Open attack_graph.png. Review centrality output — nodes with highest betweenness are the best hardening targets (e.g., agent, registry, data_store).
+
+Extensions
+	•	Map telemetry attributes (timestamps, session ids) to edge weights; detect uncommon paths used by suspicious sessions.
+	•	Export graph in Neo4j format for richer visualization.
+
+⸻
+
+Session 3 (Week 3) — Infrastructure-Level Red Teaming
+
+Exercise: Simulate secure CI/CD promotion with artefact signing and verification using Sigstore cosign and SBOM generation with Syft. (This demonstrates enforcement of supply-chain controls before deployment.)
+
+Purpose: Practitioners will learn how to sign model/container artefacts and verify signatures before allowing deployment.
+
+Note: cosign (Sigstore) and syft are external CLIs; follow install instructions on their sites. If you cannot install, the exercise also shows how to validate SBOM hash locally.
+
+Prerequisites
+	•	Docker, make, cosign CLI installed, syft (SBOM) installed.
+	•	VS Code terminal.
+
+Files to create
+
+session3/Dockerfile
+
+FROM python:3.10-slim
+WORKDIR /app
+COPY dummy_model.txt /app/dummy_model.txt
+CMD ["sleep","3600"]
+
+session3/dummy_model.txt
+
+model_name: example_model_v1
+weights_hash: abcdef1234567890
+
+session3/Makefile
+
+IMAGE=localhost:5000/example-model:latest
+
+build:
+	docker build -t $(IMAGE) .
+
+sbom:
+	syft packages docker:$(IMAGE) -o json > sbom.json
+
+sign:
+	cosign sign --key $${COSIGN_KEY} $(IMAGE)
+
+verify:
+	cosign verify --key $${COSIGN_PUB} $(IMAGE)
+
+Run it (step-by-step)
+	1.	Build image:
+
+cd session3
+docker build -t localhost:5000/example-model:latest .
+
+	2.	Generate SBOM (Software Bill of Materials):
+
+syft packages docker:localhost:5000/example-model:latest -o json > sbom.json
+
+	3.	Sign the image with cosign (you must create keypair or use keyless flow—here we show key flow):
+
+export COSIGN_KEY=./cosign.key
+export COSIGN_PUB=./cosign.pub
+cosign generate-key-pair
+make sign
+
+	4.	Verify signature (simulate admission controller check):
+
+make verify
+
+If cosign is unavailable: compute and compare hash:
+
+docker save localhost:5000/example-model:latest | sha256sum > image.hash
+jq -S . sbom.json | sha256sum > sbom.hash
+
+Compare image.hash and sbom.hash as a quick integrity check (note: not cryptographically equivalent, but useful locally).
+
+Expected behavior
+	•	cosign verify shows signature subject; admission controller would use this to allow deployment.
+	•	If you tamper with the image and re-run verify, signature validation fails.
+
+Extensions
+	•	Implement a simple bash script that refuses to run docker run unless cosign verify passes (simulates an admission controller).
+	•	Demonstrate Tekton Chains or GitHub Actions step to automatically sign images in CI.
+
+⸻
+
+Session 4 (Week 3) — Securing AI Infrastructure and Mitigating Architectural Risk
+
+Exercise: Deploy a local Kubernetes (Kubernetes) cluster via kind (Kubernetes in Docker) and apply a Kyverno policy (Kubernetes policy engine) that blocks privileged pods. Then attempt to deploy a privileged pod and observe policy rejection.
+
+Purpose: show how Policy-as-Code enforces Pod Security Standards and stops dangerous deployments.
+
+Prerequisites
+	•	kind (Kubernetes in Docker) installed, kubectl, kyverno CLI and Kyverno controller (Helm) or kubectl apply.
+	•	VS Code.
+
+Files to create
+
+session4/privileged-pod.yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: privileged-pod
+  namespace: default
+spec:
+  containers:
+  - name: naughty
+    image: busybox:1.35
+    command: ["sh","-c","sleep 3600"]
+    securityContext:
+      privileged: true
+
+session4/kyverno-block-privileged.yaml
+
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disallow-privileged
+spec:
+  validationFailureAction: enforce
+  rules:
+  - name: block-privileged-containers
+    match:
+      resources:
+        kinds:
+        - Pod
+    validate:
+      message: "Privileged containers are not allowed"
+      pattern:
+        spec:
+          containers:
+          - securityContext:
+              privileged: false
+
+Run it
+	1.	Create kind cluster:
+
+kind create cluster --name ai-sec
+kubectl cluster-info --context kind-ai-sec
+
+	2.	Install Kyverno (controller) quickly (Helm or kubectl):
+
+kubectl create -f https://raw.githubusercontent.com/kyverno/kyverno/main/config/release/install.yaml
+# wait a moment for kyverno to be ready
+kubectl wait --for=condition=available deployment -n kyverno --all --timeout=120s
+
+	3.	Apply policy:
+
+kubectl apply -f session4/kyverno-block-privileged.yaml
+
+	4.	Try to deploy privileged pod:
+
+kubectl apply -f session4/privileged-pod.yaml
+kubectl get pod privileged-pod -o yaml
+
+You should see Kyverno deny the resource; kubectl get pods will not show privileged-pod running. To see the policy violation:
+
+kubectl get events --namespace default | grep kyverno
+
+Expected outcome
+	•	Kyverno rejects the privileged pod and logs the reason: “Privileged containers are not allowed”.
+	•	Demonstrates immediate policy enforcement preventing container breakout risk.
+
+Extensions
+	•	Add additional Kyverno policies (disallow hostPath mounts, require cosign signatures annotation).
+	•	Automate weekly RBAC checks using kube-bench and report results to a monitoring dashboard.
+
+⸻
+
+Final notes (safety & scaling)
+	•	Do these exercises in isolated sandboxes (local Docker, kind) — do not run untrusted images in production.
+	•	For enterprise scale, replace local tools with managed equivalents: Jaeger → tracing backend (e.g., vendor APM), cosign → central signing with KMS, Kyverno → cluster-wide policy managed via GitOps and Argo CD.
+	•	Where a CLI like cosign or syft is required, participants should install the official binaries (links in the earlier references) or use containerized wrappers.
+
+⸻
+
