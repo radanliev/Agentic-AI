@@ -1,0 +1,300 @@
+References 
+
+Here are the sources I used for this lesson
+
+References for Session 1
+•	NIST AI 100-2 — Adversarial Machine Learning: A Taxonomy and Terminology of Attacks and Mitigations (2025): https://csrc.nist.gov/pubs/ai/100/2/e2025/final
+•	MITRE ATLAS — Adversarial Threat Landscape for AI Systems: https://atlas.mitre.org/
+•	MITRE / Microsoft — Kubernetes Threat Matrix: https://github.com/microsoft/Threat-Matrix-for-Kubernetes
+•	NIST AI Risk Management Framework (RMF): https://www.nist.gov/itl/ai-risk-management-framework
+•	OWASP LLM Top 10 (2025): https://owasp.org/www-project-top-10-for-large-language-model-applications/
+•	Microsoft Defender for Cloud — Attack Paths overview: https://learn.microsoft.com/en-us/azure/defender-for-cloud/how-to-manage-attack-path 
+•	Microsoft Defender for Containers — Attack Path exploration: https://learn.microsoft.com/en-us/azure/defender-for-cloud/how-to-test-attack-path-and-security-explorer-with-vulnerable-container-image
+•	Kubernetes RBAC and Pod Security Standards: https://kubernetes.io/docs/concepts/security/pod-security-standards/
+•	Sigstore Policy Controller: https://docs.sigstore.dev/policy-controller/overview
+•	SLSA v1.0 Provenance Specification: https://slsa.dev/spec/v1.0/provenance
+•	OpenTelemetry GenAI Semantic Conventions: https://opentelemetry.io/docs/specs/semconv/gen-ai/
+•	OpenLineage documentation: https://openlineage.io/docs/
+
+References for Session 2
+
+Government / National Agencies & Standards
+1.	NIST (National Institute of Standards and Technology) — Adversarial Machine Learning: A Taxonomy and Terminology of Attacks and Mitigations (NIST.AI 100-2, Final) — canonical taxonomy tying attack classes to lifecycle stages and detection signals.
+https://csrc.nist.gov/pubs/ai/100/2/e2025/final
+2.	NIST (National Institute of Standards and Technology) — ARIA (Assessing Risks and Impacts of AI) program announcement — TEVV (Testing, Evaluation, Validation and Verification) programme for sociotechnical testing.
+https://www.nist.gov/news-events/news/2024/05/nist-launches-aria-new-program-advance-sociotechnical-testing-and
+3.	CISA (Cybersecurity and Infrastructure Security Agency) — AI Data Security: Best Practices for Securing Data Used to Train & Operate AI Systems (with NSA, FBI and partners) — operational controls for data integrity and pipeline sensors.
+https://www.cisa.gov/resources-tools/resources/ai-data-security-best-practices-securing-data-used-train-operate-ai-systems
+4.	ENISA (European Union Agency for Cybersecurity) — ENISA Threat Landscape 2025 (PDF) — empirically grounded AI-assisted attack scenarios useful to prioritise test cases.
+https://www.enisa.europa.eu/sites/default/files/2025-10/ENISA%20Threat%20Landscape%202025_0.pdf
+5.	UK NCSC (United Kingdom National Cyber Security Centre) — Guidance on digital forensics and protective monitoring — procedural guidance applicable to agentic-AI log preservation and chain-of-custody.
+https://www.ncsc.gov.uk/guidance/guidance-on-digital-forensics-protective-monitoring
+6.	OSTP (Office of Science & Technology Policy, White House) — AI assurance initiatives and resources (policy alignment for testing and evidence retention).
+https://www.whitehouse.gov/ostp/ai/
+
+MITRE & Operational Frameworks
+7.	MITRE (MITRE Corporation) — ATLAS (Adversarial Threat Landscape for AI Systems) — ATT&CK-style mapping of adversarial tactics & techniques for AI; used to map telemetry to TTPs.
+https://atlas.mitre.org/
+8.	MITRE (MITRE Corporation) — SAFE-AI (framework for securing AI-enabled systems) (report / PDF referenced in session) — operationalises telemetry and engineering controls.
+https://atlas.mitre.org/pdf-files/SAFEAI_Full_Report.pdf
+9.	MITRE (MITRE Corporation) — AI Red Teaming: Advancing Safe and Secure AI Systems — practical recommendations for instrumenting models and agent runtimes for red teaming.
+https://www.mitre.org/news-insights/publication/ai-red-teaming-advancing-safe-and-secure-ai-systems
+
+Industry / Cloud Vendor Guidance (practical, production)
+10.	Amazon Web Services (AWS) — Navigating the security landscape of generative AI (official whitepaper / PDF) — concrete telemetry architecture, token-level logging, and SIEM integration patterns for agentic systems.
+https://d1.awsstatic.com/whitepapers/compliance/Navigating_the_security_landscape_of_generative_AI.pdf
+11.	Google Cloud — Chronicle & security operations / GTIG (Google Threat Intelligence Group) materials — large-scale telemetry ingestion and examples of adversarial misuse.
+GTIG blog summary: https://cloud.google.com/blog/topics/threat-intelligence/adversarial-misuse-generative-ai
+Chronicle / RSAC material (contextual): https://cloud.google.com/blog/products/identity-security/the-dawn-of-agentic-ai-in-security-operations-at-rsac-2025
+12.	Microsoft — Microsoft Digital Defense Report (2024) — operational findings and detection performance metrics useful for setting realistic red-team thresholds.
+https://cdn-dynmedia-1.microsoft.com/is/content/microsoftcorp/microsoft/final/en-us/microsoft-brand/documents/Microsoft%20Digital%20Defense%20Report%202024%20%281%29.pdf
+13.	OpenAI — ChatGPT Agent System Card / Agent launch materials — vendor system card that documents threat models, telemetry suggestions and red-team results for agent behaviour.
+https://cdn.openai.com/pdf/6bcccca6-3b64-43cb-a66e-4647073142d7/chatgpt_agent_system_card_launch.pdf
+14.	Anthropic — Red Teaming Language Models (methods and lessons learned) — operational account of designing and scaling red teams against LLMs (useful for test harness design and scoring).
+https://www-cdn.anthropic.com/82564d4ec2451b2eed2e0796b7c658fc989f0c1a/Anthropic_RedTeaming.pdf
+
+Leading Security Vendors / Threat Intelligence (incident case studies)
+15.	Palo Alto Networks — Unit 42 — Threat Frontier: Prepare for Emerging AI Risks and Incident Response reports — telemetry mappings, TTPs and forensic collection recommendations.
+Unit 42 blog/report: https://unit42.paloaltonetworks.com/prepare-for-emerging-ai-risks-unit-42-threat-frontier/
+Incident Response resources hub: https://www.paloaltonetworks.com/resources/research/2025-incident-response-report
+16.	CrowdStrike — Threat Hunting / Global Threat Report (2024–2025) — detection guidance and IoCs that translate to observability rules for agentic AIs.
+https://www.crowdstrike.com/en-gb/resources/reports/threat-hunting-report/
+https://www.crowdstrike.com/en-us/global-threat-report/
+17.	Cisco Talos — Year in Review (2024) and AI-threat analyses — empirical TTPs for automation-driven attacks (useful for SOC rule design).
+https://blog.talosintelligence.com/available-now-2024-year-in-review/
+
+Practical Standards, Tooling & Observability Conventions
+18.	OpenTelemetry (OTel) — GenAI / Agent Span Semantic Conventions — standard attribute names and span types for instrumenting agentic systems (critical for cross-cloud correlation).
+https://opentelemetry.io/docs/specs/semconv/gen-ai/
+19.	OpenLineage — documentation for data lineage and instrumentation to tie ingestion/transformation events to model training and inference (key to forensic reconstruction).
+https://openlineage.io/docs/
+20.	SLSA (Supply-chain Levels for Software Artifacts) v1.0 — provenance spec for attestations in CI/CD and transformations (recommended for transformation and model artefact attestation).
+https://slsa.dev/spec/v1.0/provenance
+
+Red Teaming Playbooks, Guidance & Policy References
+21.	Sandia National Laboratories — Red Teaming Quick Reference Sheet (TR) — evidence capture and measurement practices applicable to observability-integrated red teams.
+https://www.sandia.gov/app/uploads/sites/87/2021/08/2017-09-13_RT4PM_QRS_SAN2017-9535-TR.pdf
+22.	RAND Corporation — Exploring red teaming to identify new and emerging risks from AI (workshop proceedings) — scenario and persona design for sociotechnical red teams.
+https://www.rand.org/content/dam/rand/pubs/conf_proceedings/CFA3000/CFA3031-1/RAND_CFA3031-1.pdf
+23.	U.S. Department of Defense (DoD) — DoD Instruction 8585.01 “DoD Cyber Red Teams” — operational constraints and reporting requirements for high-assurance red teaming.
+https://www.esd.whs.mil/Portals/54/Documents/DD/issuances/dodi/858501p.pdf?ver=0J4GT4-ji4H0Dd7mOa173w%3D%3D
+24.	UK Government (Cabinet Office / Centre for Protection) — Red Teaming Handbook (3rd edition) — reproducible evidence capture and independent verification guidance.
+https://assets.publishing.service.gov.uk/media/61702155e90e07197867eb93/20210625-Red_Teaming_Handbook.pdf
+
+References for Session 3
+
+1 · DevSecOps and Software-Supply-Chain Security
+•	NIST SP 800-218 – Secure Software Development Framework (SSDF)
+National Institute of Standards and Technology (2022).
+https://csrc.nist.gov/pubs/sp/800/218/final 
+•	SLSA v1.0 – Supply-chain Levels for Software Artifacts (Provenance Specification)
+Open SSF / Google Security Team (2023).
+https://slsa.dev/spec/v1.0/provenance 
+•	Sigstore Project – cosign & Policy Controller Documentation
+Open-source digital-signature and attestation framework for containers and models.
+https://docs.sigstore.dev/policy-controller/overview 
+•	Tekton Chains Provenance and Attestation Framework
+CNCF Tekton Project (2023).
+https://tekton.dev/docs/chains/ 
+•	Argo CD (Declarative GitOps Deployment)
+Cloud Native Computing Foundation (2024).
+https://argo-cd.readthedocs.io/en/stable/ 
+
+2 · Container Orchestration and Kubernetes Security
+•	Kubernetes Pod Security Standards (PSS)
+Official Kubernetes Documentation (2024).
+https://kubernetes.io/docs/concepts/security/pod-security-standards/ 
+•	Kubernetes Role-Based Access Control (RBAC) Guidelines
+Official Kubernetes Reference.
+https://kubernetes.io/docs/reference/access-authn-authz/rbac/ 
+•	Kyverno – Policy Engine for Kubernetes
+CNCF Project (2024).
+https://kyverno.io/docs/ 
+•	Open Policy Agent (OPA) Gatekeeper
+Policy-as-code enforcement for Kubernetes.
+https://open-policy-agent.github.io/gatekeeper/ 
+•	CIS (Center for Internet Security) Kubernetes Benchmark v1.24
+CIS Security Controls for Kubernetes hardening.
+https://www.cisecurity.org/benchmark/kubernetes 
+
+3 · Runtime Monitoring and Threat Detection
+•	Falco Runtime Security Project (Sysdig Foundation)
+Real-time intrusion and anomaly detection for containers and Kubernetes.
+https://falco.org/docs/ 
+•	Kubescape – Kubernetes Security Posture Management (SPM)
+ARMO Security (2024).
+https://kubescape.io/docs/ 
+•	OpenTelemetry (OTel) – Observability and Tracing Standard
+Cloud Native Computing Foundation (2024).
+https://opentelemetry.io/docs/ 
+•	OpenLineage – Data Provenance and Lineage Framework
+Open Standard (2024).
+https://openlineage.io/docs/ 
+•	HashiCorp Vault – Secrets Management for Telemetry and mTLS
+https://developer.hashicorp.com/vault/docs 
+
+4 · Cloud and Inference Endpoint Security
+•	AWS SageMaker Security Best Practices
+Amazon Web Services Documentation (2025).
+https://docs.aws.amazon.com/sagemaker/latest/dg/security-best-practices.html 
+•	Google Cloud Vertex AI – Security and IAM Best Practices
+Google Cloud Documentation (2025).
+https://cloud.google.com/vertex-ai/docs/security 
+•	Istio Service Mesh – Security Concepts (mTLS and AuthorizationPolicy)
+Istio Project (2024).
+https://istio.io/latest/docs/concepts/security/ 
+•	Cilium Network Policies for Zero-Trust Kubernetes Networking
+Isovalent / Cilium Project (2025).
+https://docs.cilium.io/en/stable/policy/ 
+
+5 · AI and Model Security Frameworks
+•	MITRE ATLAS – Adversarial Threat Landscape for Artificial Intelligence Systems
+MITRE Corporation (2025).
+https://atlas.mitre.org/ 
+•	NIST AI 100-2 – Adversarial Machine Learning: Taxonomy and Terminology of Attacks and Mitigations (Final 2025)
+https://csrc.nist.gov/pubs/ai/100/2/e2025/final 
+•	OWASP LLM Top 10 – Large Language Model Application Security Risks (2025)
+https://owasp.org/www-project-top-10-for-large-language-model-applications/ 
+•	ISO/IEC 42001 – Artificial Intelligence Management System Standard (2025)
+International Organization for Standardization.
+https://www.iso.org/standard/81230.html 
+
+6 · Incident Response and Compliance
+•	ISO/IEC 27017 – Information Security Controls for Cloud Services
+https://www.iso.org/standard/43757.html 
+•	SOC 2 (Type II) Trust Service Criteria – AICPA (Approved Framework).
+https://www.aicpa.org/resources/article/soc-2-trust-services-criteria 
+•	NIST Cybersecurity Framework 2.0 (Draft 2024)
+https://www.nist.gov/cyberframework 
+
+References for Session 4
+
+
+1 · Government and International Standards
+1.	NIST SP 800-218 — Secure Software Development Framework (SSDF)
+U.S. National Institute of Standards and Technology (2022).
+Canonical guidance for integrating security across the software and model-development lifecycle.
+https://csrc.nist.gov/pubs/sp/800/218/final 
+2.	NIST AI 100-2 — Adversarial Machine Learning: Taxonomy and Terminology of Attacks and Mitigations (Final 2025)
+Defines adversarial attack classes and mitigation strategies relevant to model-training and deployment risk.
+https://csrc.nist.gov/pubs/ai/100/2/e2025/final 
+3.	ISO/IEC 27017 — Information-Security Controls for Cloud Services
+International Organization for Standardization (2015, current).
+Baseline cloud-security controls for multi-tenant AI infrastructures.
+https://www.iso.org/standard/43757.html 
+4.	ISO/IEC 42001 — Artificial Intelligence Management System Standard (2025)
+Defines management, documentation, and audit requirements for AI assurance programmes.
+https://www.iso.org/standard/81230.html 
+5.	CIS (Centre for Internet Security) Kubernetes Benchmark v1.24
+Benchmarks for secure configuration of Kubernetes clusters, including RBAC (Role-Based Access Control) and pod-security controls.
+https://www.cisecurity.org/benchmark/kubernetes 
+ 
+2 · Software-Supply-Chain Security and Provenance
+6.	SLSA v1.0 — Supply-chain Levels for Software Artifacts (Provenance Specification)
+OpenSSF / Google Security Team (2023).
+Defines attestation formats and verification levels for build pipelines.
+https://slsa.dev/spec/v1.0/provenance 
+7.	Sigstore cosign and Policy Controller Documentation
+Open-source cryptographic-signing framework for containers and model artefacts.
+https://docs.sigstore.dev/policy-controller/overview 
+8.	Tekton Chains Provenance and Attestation Framework
+Cloud Native Computing Foundation (2023).
+Implementation reference for generating SLSA-compliant attestations in CI/CD.
+https://tekton.dev/docs/chains/ 
+9.	Argo CD and Argo Rollouts (GitOps and Progressive Delivery)
+CNCF project enabling policy-controlled, auditable deployments.
+https://argo-cd.readthedocs.io/en/stable/ 
+https://argoproj.github.io/argo-rollouts/ 
+ 
+3 · Container Orchestration and Runtime Hardening
+10.	Kubernetes Pod Security Standards (PSS)
+Official Kubernetes documentation (2024).
+Establishes baseline, restricted, and privileged profiles for pod security.
+https://kubernetes.io/docs/concepts/security/pod-security-standards/ 
+11.	Kubernetes RBAC (Role-Based Access Control) Reference
+Official API reference and configuration guidance.
+https://kubernetes.io/docs/reference/access-authn-authz/rbac/ 
+12.	Kyverno Policy Engine for Kubernetes
+CNCF policy-as-code project used for pod-security and container-policy enforcement.
+https://kyverno.io/docs/ 
+13.	Open Policy Agent (OPA) Gatekeeper
+Policy-as-code admission controller for Kubernetes clusters.
+https://open-policy-agent.github.io/gatekeeper/ 
+14.	Falco Runtime Security Project (Sysdig Foundation)
+Detects abnormal container and kernel activity in real time.
+https://falco.org/docs/ 
+15.	Trivy and Syft — Container Scanner and Software Bill of Materials Generator
+Aqua Security (2025).
+Produces SBOMs (Software Bills of Materials) and scans for Common Vulnerabilities and Exposures (CVEs).
+https://aquasecurity.github.io/trivy/ 
+https://github.com/anchore/syft 
+16.	Distroless Containers (Google Container Tools)
+Minimal base-image approach eliminating package managers and shells to reduce attack surface.
+https://github.com/GoogleContainerTools/distroless 
+ 
+4 · Networking and API Defences
+17.	Istio Service Mesh — Security Concepts (mTLS and AuthorizationPolicy)
+Official Istio documentation (2024).
+Implements mutual TLS and fine-grained service authorisation between pods.
+https://istio.io/latest/docs/concepts/security/ 
+18.	Cilium Network Policies for Zero-Trust Kubernetes Networking
+Isovalent / Cilium Project (2025).
+Provides Layer-7 network segmentation and policy enforcement.
+https://docs.cilium.io/en/stable/policy/ 
+19.	Kong Gateway Enterprise Rate-Limiting and Security Plugins
+Industry-standard API gateway implementing per-user quotas and schema validation.
+https://docs.konghq.com/gateway/latest/ 
+20.	Amazon API Gateway — Throttling and Rate Limiting Guide
+Official AWS documentation.
+https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-request-throttling.html 
+ 
+5 · Observability and Forensics
+21.	OpenTelemetry (OTel) — Observability and Tracing Standard
+Cloud Native Computing Foundation (2024).
+Standard for distributed tracing of model-serving and inference workloads.
+https://opentelemetry.io/docs/ 
+22.	OpenLineage — Data Lineage and Provenance Framework
+Provides dataset-to-job-to-model lineage essential for forensic reconstruction.
+https://openlineage.io/docs/ 
+23.	WORM (Write Once Read Many) Storage Concepts — AWS Object Lock and Azure Immutable Blob
+Vendor documentation for immutable evidence preservation.
+AWS Object Lock: https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html 
+Azure Immutable Storage: https://learn.microsoft.com/en-us/azure/storage/blobs/immutable-storage-overview 
+24.	Security Information and Event Management (SIEM) Platforms
+o	Splunk Enterprise Security: https://docs.splunk.com/Documentation/ES/latest/User/Overview 
+o	Microsoft Sentinel (Cloud SIEM and SOAR): https://learn.microsoft.com/en-us/azure/sentinel/ 
+ 
+6 · Incident Response and Operational Guidance
+25.	NIST SP 800-61 Revision 2 — Computer Security Incident Handling Guide
+Standard methodology for detection, containment, eradication, and recovery phases.
+https://csrc.nist.gov/pubs/sp/800/61/r2/final 
+26.	AWS Security Incident Response Guide (Playbooks)
+Official reference for automated containment and forensic capture in cloud environments.
+https://docs.aws.amazon.com/whitepapers/latest/aws-security-incident-response-guide/aws-security-incident-response-guide.html 
+27.	Google Cloud Incident Response Best Practices
+Aligns with ISO 27035 and NIST SP 800-61 for AI/ML deployments.
+https://cloud.google.com/security/incident-response/docs/best-practices 
+ 
+7 · Complementary Frameworks and Industry Resources
+28.	MITRE ATLAS — Adversarial Threat Landscape for AI Systems
+Taxonomy of AI-specific tactics, techniques, and procedures (TTPs).
+https://atlas.mitre.org/ 
+29.	OWASP LLM Top 10 — Large Language Model Application Security Risks (2025)
+Enumerates prompt-injection, data-leakage, and model-supply-chain risks.
+https://owasp.org/www-project-top-10-for-large-language-model-applications/ 
+30.	Cloud Native Security White Paper (CNCF Security TAG)
+End-to-end recommendations for securing containers, CI/CD, and service meshes.
+https://github.com/cncf/tag-security/tree/main/whitepapers 
+ 
+How These References Support Session 4
+•	Items 1–5: define global and national standards your enterprise compliance must align with (NIST, ISO, CIS).
+•	Items 6–9: supply-chain attestation and signing, ensuring cryptographic trust from build to deployment.
+•	Items 10–16: secure container orchestration, hardened runtime, and image scanning.
+•	Items 17–20: network and API defences, including service-mesh-level mutual TLS and rate limiting.
+•	Items 21–24: observability, telemetry, and forensic preservation for post-incident analysis.
+•	Items 25–27: incident-response frameworks and playbooks.
+•	Items 28–30: cross-industry AI-security knowledge bases for mapping adversarial techniques to mitigations.
+
+
+
+
