@@ -1,0 +1,22 @@
+# .github/workflows/snyk-scan.yml
+name: Example workflow for Python using Snyk
+on: push
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/python@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with: 
+          command: code test
+          args: --sarif-file-output=snyk.sarif
+      - name: Print the Snyk sarif file
+        run : cat snyk.sarif
+
+
+
+        path: snyk_report.json
